@@ -1,0 +1,268 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>논알콜카페리스트 벙 리스트🌷</title>
+<style>
+:root{--bg:#faf6ef;--card:#fff;--ink:#2b2622;--mute:#8a8178;--line:#e9e1d4;--red:#d0342c;--redbg:#fdecea;--ok:#2f7d4f;
+box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#1b1815;--card:#26221e;--ink:#f1ebe2;--mute:#a69d92;--line:#3a342e;--red:#ef5a50;--redbg:#3a2220;--ok:#5cc084}}
+:root[data-theme="dark"]{--bg:#1b1815;--card:#26221e;--ink:#f1ebe2;--mute:#a69d92;--line:#3a342e;--red:#ef5a50;--redbg:#3a2220;--ok:#5cc084}
+*{box-sizing:border-box}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:-apple-system,"Apple SD Gothic Neo","Noto Sans KR","Malgun Gothic",sans-serif;line-height:1.5}
+main{max-width:520px;margin:0 auto;padding:20px 16px 48px}
+h1{font-size:22px;margin:4px 0 2px}
+.sub{color:var(--mute);font-size:14px;margin:0 0 18px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:16px;margin-bottom:14px}
+h2{font-size:16px;margin:0 0 10px}
+.count{font-size:34px;font-weight:800;color:var(--red)}
+.grid{display:grid;grid-template-columns:repeat(5,1fr);gap:8px;margin-top:10px}
+.slot{aspect-ratio:1;border:2px dashed var(--line);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:12px;color:var(--mute)}
+.slot.on{border:2px solid var(--ink);background:url(/img/baikin.jpg) center/cover no-repeat;color:transparent;transform:rotate(-8deg);box-shadow:0 1px 4px rgba(0,0,0,.25)}
+input{width:100%;padding:12px;border:1px solid var(--line);border-radius:10px;background:var(--bg);color:var(--ink);font-size:16px;margin-bottom:8px}
+button{font:inherit;cursor:pointer;border:0;border-radius:10px;padding:12px 16px;font-weight:700}
+.main{background:var(--red);color:#fff;width:100%;font-size:16px}
+.ok{background:var(--ok);color:#fff}
+.ghost{background:transparent;color:var(--mute);border:1px solid var(--line)}
+button:disabled{opacity:.5}
+.row{display:flex;align-items:center;justify-content:space-between;gap:8px;padding:10px 0;border-top:1px solid var(--line)}
+.row:first-of-type{border-top:0}
+.row .who{font-weight:700}.row .meta{font-size:12px;color:var(--mute)}
+.btns{display:flex;gap:6px}.btns button{padding:8px 12px;font-size:14px}
+.empty{color:var(--mute);font-size:14px;padding:6px 0}
+.badge{display:inline-block;background:var(--redbg);color:var(--red);font-size:12px;font-weight:700;padding:2px 8px;border-radius:99px;margin-left:6px}
+.msg{font-size:14px;color:var(--mute);margin:6px 0 0}
+.seg{display:flex;gap:8px;margin-bottom:8px}
+.seg button{flex:1;background:var(--bg);color:var(--mute);border:1px solid var(--line);padding:10px}
+.seg button.sel{background:var(--redbg);color:var(--red);border-color:var(--red)}
+.slot.host{border:2px solid var(--ink);background:url(/img/anpan.jpg) var(--hx,50%) var(--hy,50%)/var(--hz,100%) var(--hz,100%) no-repeat;color:transparent;transform:rotate(var(--hr,8deg));box-shadow:0 1px 4px rgba(0,0,0,.25)}
+.sec{font-size:13px;font-weight:700;color:var(--mute);margin:16px 0 0}
+.bar{height:8px;background:var(--line);border-radius:99px;overflow:hidden;margin-top:6px}
+.bar i{display:block;height:100%;background:var(--red)}
+.tag{font-size:11px;font-weight:700;border-radius:99px;padding:1px 7px;margin-right:6px;background:var(--line);color:var(--mute)}
+.tag.host{background:var(--redbg);color:var(--red)}
+.ctl{display:flex;align-items:center;gap:8px;font-size:13px;margin:6px 0}.ctl span{width:64px;color:var(--mute)}.ctl input{margin:0;padding:0;flex:1}.ctl b{width:44px;text-align:right}
+</style>
+</head>
+<body>
+<main>
+  <h1>논알콜카페리스트 벙 리스트🌷</h1>
+  <p class="sub">이름 적고 참석 신청 → 운영자가 확인 도장을 찍어야 횟수로 인정돼요</p>
+  <div id="app"><div class="card empty">불러오는 중…</div></div>
+</main>
+<script>
+(function(){
+  var app=document.getElementById('app');
+  var DEF={zoom:100,x:50,y:50,rot:8};
+  var state={requests:[],stamps:[],hs:null,hd:null,me:'',unlocked:false,pw:'',pwErr:'',delId:null,note:'',raw:'',draft:{name:'',memo:'',kind:'벙참'}};
+  function h(tag,attrs,kids){
+    var e=document.createElement(tag);
+    if(attrs)for(var k in attrs){
+      if(k==='text')e.textContent=attrs[k];
+      else if(k==='on')for(var ev in attrs.on)e.addEventListener(ev,attrs.on[ev]);
+      else if(k==='class')e.className=attrs[k];
+      else e.setAttribute(k,attrs[k]);
+    }
+    (kids||[]).forEach(function(c){if(c)e.appendChild(c)});
+    return e;
+  }
+  function fmt(ts){var d=new Date(ts);return (d.getMonth()+1)+'/'+d.getDate()+' '+('0'+d.getHours()).slice(-2)+':'+('0'+d.getMinutes()).slice(-2)}
+  function savedName(){try{return localStorage.getItem('stamp-name')||''}catch(e){return ''}}
+  function saveName(n){try{localStorage.setItem('stamp-name',n)}catch(e){}}
+  function key(n){return String(n||'').trim().replace(/\s+/g,' ').toLowerCase()}
+  function api(path,body){
+    return fetch('/api/'+path,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)})
+      .then(function(r){return r.json().catch(function(){return {}})}).catch(function(){return {}});
+  }
+  function admin(action,extra){
+    return api('admin',Object.assign({password:state.pw,action:action},extra||{})).then(function(r){state.raw='';return load().then(function(){return r})});
+  }
+  function applyHs(){
+    var s=state.hd||state.hs||DEF,r=document.documentElement.style;
+    r.setProperty('--hz',s.zoom+'%');r.setProperty('--hx',s.x+'%');r.setProperty('--hy',s.y+'%');r.setProperty('--hr',s.rot+'deg');
+  }
+  function myStamps(){return state.stamps.filter(function(s){return s.memberId===state.me})}
+  function myPending(){return state.requests.filter(function(r){return r.memberId===state.me})}
+  function cnt(list){
+    var cam=0,host=0;
+    list.forEach(function(s){if(s.kind==='벙주')host++;else cam++});
+    return {cam:cam,host:host,auto:Math.floor(cam/5),hostTotal:host+Math.floor(cam/5)};
+  }
+  function tagName(w,k){return h('div',{class:'who'},[h('span',{class:'tag'+(k==='벙주'?' host':''),text:k==='벙주'?'벙주':'벙참'}),document.createTextNode(w)])}
+
+  function render(){
+    app.textContent='';
+    app.appendChild(memberCard());
+    app.appendChild(boardCard());
+    app.appendChild(ownerCard());
+  }
+
+  function memberCard(){
+    var c=cnt(myStamps()), pend=myPending().length, d=state.draft;
+    var card=h('div',{class:'card'});
+    card.appendChild(h('h2',{text:'내 도장 카드'}));
+    var nameIn=h('input',{placeholder:'내 이름(닉네임) — 매번 같은 이름으로 적어주세요',maxlength:'20',value:d.name});
+    nameIn.addEventListener('input',function(){d.name=nameIn.value});
+    nameIn.addEventListener('change',function(){d.name=nameIn.value.trim();saveName(d.name);state.me=key(d.name);render()});
+    card.appendChild(nameIn);
+    var top=h('div');
+    top.appendChild(h('span',{class:'count',text:String(c.cam)}));
+    top.appendChild(h('span',{text:' 회 벙참'}));
+    if(pend)top.appendChild(h('span',{class:'badge',text:'확인 대기 '+pend}));
+    card.appendChild(top);
+    var total=Math.max(10,Math.ceil(c.cam/10)*10);
+    var g=h('div',{class:'grid'});
+    for(var i=1;i<=total;i++)g.appendChild(h('div',{class:'slot'+(i<=c.cam?' on':''),text:i<=c.cam?'':String(i)}));
+    card.appendChild(g);
+
+    card.appendChild(h('div',{class:'sec',text:'👑 벙주 (벙참 5회 = 벙주 1회 자동 체크)'}));
+    var ht=h('div',{style:'margin-top:6px'});
+    ht.appendChild(h('span',{class:'count',text:String(c.hostTotal)}));
+    ht.appendChild(h('span',{text:' 회 벙주'}));
+    if(c.host||c.auto)ht.appendChild(h('span',{class:'msg',text:'  (직접 '+c.host+' + 5회 달성 '+c.auto+')'}));
+    card.appendChild(ht);
+    var hg=h('div',{class:'grid'});
+    var ht2=Math.max(5,Math.ceil(c.hostTotal/5)*5);
+    for(var j=1;j<=ht2;j++)hg.appendChild(h('div',{class:'slot'+(j<=c.hostTotal?' host':''),text:j<=c.hostTotal?'':String(j)}));
+    card.appendChild(hg);
+    var r=c.cam%5;
+    card.appendChild(h('p',{class:'msg',text:'다음 벙주 체크까지 벙참 '+(5-r)+'회 남았어요 ('+r+'/5)'}));
+    card.appendChild(h('div',{class:'bar'},[h('i',{style:'width:'+(r*20)+'%'})]));
+
+    var memoIn=h('input',{placeholder:'어떤 벙이었나요? (예: 10/5 한강 러닝벙)',maxlength:'40',value:d.memo});
+    memoIn.addEventListener('input',function(){d.memo=memoIn.value});
+    var seg=h('div',{class:'seg'});
+    ['벙참','벙주'].forEach(function(k){
+      seg.appendChild(h('button',{class:d.kind===k?'sel':'',text:k==='벙주'?'👑 벙주':'🙋 벙참',on:{click:function(){d.kind=k;d.name=nameIn.value;d.memo=memoIn.value;render()}}}));
+    });
+    var btn=h('button',{class:'main',text:'도장 요청하기',on:{click:function(){submit(nameIn.value.trim(),memoIn.value.trim(),btn)}}});
+    card.appendChild(h('div',{style:'margin-top:16px'},[memoIn,seg,btn]));
+    if(state.note)card.appendChild(h('p',{class:'msg',text:state.note}));
+    return card;
+  }
+
+  function submit(name,memo,btn){
+    if(!name){state.note='이름을 입력해주세요.';render();return}
+    if(!memo){state.note='어떤 벙인지 간단히 적어주세요.';render();return}
+    saveName(name);state.me=key(name);state.draft.name=name;
+    btn.disabled=true;
+    api('request',{name:name,memo:memo,kind:state.draft.kind}).then(function(r){
+      if(r.ok){state.draft.memo='';state.note='요청 완료! 운영자가 확인하면 도장이 찍혀요.';state.raw='';load().then(render)}
+      else{state.note='요청에 실패했어요. 잠시 후 다시 시도해주세요.';render()}
+    });
+  }
+
+  function boardCard(){
+    var card=h('div',{class:'card'});
+    card.appendChild(h('h2',{text:'🏆 참석 현황'}));
+    var by={};
+    state.stamps.forEach(function(s){
+      var k=s.memberId;
+      if(!by[k])by[k]={name:s.name,list:[],last:0};
+      by[k].list.push(s);
+      if(s.ts>=by[k].last){by[k].last=s.ts;by[k].name=s.name}
+    });
+    var list=Object.keys(by).map(function(k){var m=by[k];m.c=cnt(m.list);return m}).sort(function(a,b){return b.c.cam-a.c.cam||b.c.hostTotal-a.c.hostTotal||b.last-a.last});
+    if(!list.length)card.appendChild(h('div',{class:'empty',text:'아직 찍힌 도장이 없어요.'}));
+    list.forEach(function(m,i){
+      card.appendChild(h('div',{class:'row'},[
+        h('div',{class:'who',text:(i+1)+'. '+m.name}),
+        h('div',{text:'벙참 '+m.c.cam+' · 👑 벙주 '+m.c.hostTotal})
+      ]));
+    });
+    return card;
+  }
+
+  function ownerCard(){
+    var card=h('div',{class:'card'});
+    card.appendChild(h('h2',{text:'🔒 운영자 확인함'}));
+    if(!state.unlocked){
+      var pw=h('input',{type:'password',inputmode:'numeric',placeholder:'운영자 비밀번호',maxlength:'30'});
+      var go=function(){
+        var v=pw.value;
+        api('admin',{password:v,action:'verify'}).then(function(r){
+          if(r.ok){state.unlocked=true;state.pw=v;state.pwErr='';render()}
+          else{state.pwErr='비밀번호가 맞지 않아요.';render()}
+        });
+      };
+      pw.addEventListener('keydown',function(e){if(e.key==='Enter')go()});
+      card.appendChild(pw);
+      card.appendChild(h('button',{class:'main',text:'열기',on:{click:go}}));
+      if(state.pwErr)card.appendChild(h('p',{class:'msg',style:'color:var(--red)',text:state.pwErr}));
+      return card;
+    }
+    card.appendChild(h('button',{class:'ghost',style:'margin-bottom:6px',text:'🔒 잠그기',on:{click:function(){state.unlocked=false;state.pw='';render()}}}));
+    if(!state.requests.length)card.appendChild(h('div',{class:'empty',text:'대기 중인 요청이 없어요.'}));
+    state.requests.slice().sort(function(a,b){return a.ts-b.ts}).forEach(function(r){
+      var ok=h('button',{class:'ok',text:'도장 찍기'});
+      var no=h('button',{class:'ghost',text:'거절'});
+      ok.addEventListener('click',function(){ok.disabled=no.disabled=true;admin('approve',{id:r.id})});
+      no.addEventListener('click',function(){ok.disabled=no.disabled=true;admin('reject',{id:r.id})});
+      card.appendChild(h('div',{class:'row'},[
+        h('div',null,[tagName(r.name,r.kind),h('div',{class:'meta',text:r.memo+' · '+fmt(r.ts)})]),
+        h('div',{class:'btns'},[ok,no])
+      ]));
+    });
+    card.appendChild(h('div',{class:'sec',text:'찍은 도장 기록 (잘못 찍었으면 삭제)'}));
+    if(!state.stamps.length)card.appendChild(h('div',{class:'empty',text:'아직 찍은 도장이 없어요.'}));
+    state.stamps.slice().sort(function(a,b){return b.ts-a.ts}).slice(0,60).forEach(function(s){
+      var sure=state.delId===s.id;
+      var del=h('button',{class:sure?'main':'ghost',style:sure?'width:auto;padding:8px 12px;font-size:14px':'',text:sure?'정말 삭제?':'삭제'});
+      del.addEventListener('click',function(){
+        if(!sure){state.delId=s.id;render();return}
+        del.disabled=true;state.delId=null;admin('delStamp',{id:s.id});
+      });
+      card.appendChild(h('div',{class:'row'},[
+        h('div',null,[tagName(s.name,s.kind),h('div',{class:'meta',text:s.memo+' · '+fmt(s.ts)})]),
+        h('div',{class:'btns'},[del])
+      ]));
+    });
+    card.appendChild(hsCard());
+    return card;
+  }
+
+  function hsCard(){
+    var cur=state.hd||state.hs||DEF;
+    var wrap=h('div',null,[h('div',{class:'sec',text:'🎨 벙주 도장 조절 (저장하면 모두에게 적용)'}),h('div',{style:'width:72px;margin:10px 0'},[h('div',{class:'slot host'})])]);
+    [['zoom','확대',100,250],['x','좌우 위치',0,100],['y','상하 위치',0,100],['rot','기울기',-30,30]].forEach(function(d){
+      var k=d[0],val=h('b',{text:String(cur[k])});
+      var inp=h('input',{type:'range',min:String(d[2]),max:String(d[3]),value:String(cur[k])});
+      inp.addEventListener('input',function(){
+        if(!state.hd)state.hd=Object.assign({},state.hs||DEF);
+        state.hd[k]=+inp.value;val.textContent=inp.value;applyHs();
+      });
+      wrap.appendChild(h('div',{class:'ctl'},[h('span',{text:d[1]}),inp,val]));
+    });
+    var save=h('button',{class:'ok',text:'저장',on:{click:function(){
+      if(!state.hd)return;
+      save.disabled=true;var s=state.hd;
+      admin('settings',{settings:s}).then(function(){state.hd=null;applyHs();render()});
+    }}});
+    var rst=h('button',{class:'ghost',text:'초기화',on:{click:function(){state.hd=Object.assign({},DEF);applyHs();render()}}});
+    var cancel=h('button',{class:'ghost',text:'되돌리기',on:{click:function(){state.hd=null;applyHs();render()}}});
+    wrap.appendChild(h('div',{class:'btns',style:'margin-top:8px'},[save,cancel,rst]));
+    return wrap;
+  }
+
+  function load(){
+    return fetch('/api/data',{cache:'no-store'}).then(function(r){return r.json()}).then(function(d){
+      var s=JSON.stringify(d);
+      if(s===state.raw)return;
+      state.requests=d.requests||[];state.stamps=d.stamps||[];
+      state.hs=d.settings?Object.assign({},DEF,d.settings):null;
+      applyHs();
+      var a=document.activeElement;
+      if(a&&a.tagName==='INPUT'&&a.type!=='range')return;
+      state.raw=s;render();
+    }).catch(function(){});
+  }
+
+  state.draft.name=savedName();state.me=key(state.draft.name);
+  render();load();
+  setInterval(load,10000);
+})();
+</script>
+</body>
+</html>
